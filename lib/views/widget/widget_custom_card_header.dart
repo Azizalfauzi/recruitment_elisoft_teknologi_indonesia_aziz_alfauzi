@@ -1,7 +1,13 @@
 part of 'widget.dart';
 
 class WidgetHeader extends StatelessWidget {
-  const WidgetHeader({Key? key}) : super(key: key);
+  final String title;
+  final String subtitle;
+  const WidgetHeader({
+    Key? key,
+    required this.title,
+    required this.subtitle,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,14 +27,16 @@ class WidgetHeader extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'header',
+              title,
+              maxLines: 2,
               style: blackTextStyleInter.copyWith(
-                fontSize: 20,
+                fontSize: 16,
                 fontWeight: bold,
               ),
             ),
             Text(
-              'hello world pppppppppppppppppppp ppppppppppppppppppppp',
+              subtitle,
+              maxLines: 4,
               style: blackTextStyleInter.copyWith(
                 fontWeight: light,
               ),

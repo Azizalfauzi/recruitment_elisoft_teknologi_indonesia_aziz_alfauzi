@@ -5,7 +5,7 @@ class AuthServices {
     String email,
     String password,
   ) async {
-    String apiURL = "${urlElisoft}auth/login";
+    String apiURL = "https://demo.treblle.com/api/v1/auth/login";
 
     Map<String, String> headers = {
       "Content-Type": "application/json",

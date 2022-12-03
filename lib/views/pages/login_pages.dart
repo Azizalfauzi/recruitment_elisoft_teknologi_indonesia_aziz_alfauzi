@@ -8,7 +8,34 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  TextEditingController kodeController = TextEditingController();
+  // adding check token to load routes
+  @override
+  void initState() {
+    _checkStatusPageToken();
+    super.initState();
+  }
+
+  Future<void> _checkStatusPageToken() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? name = preferences.getString('name');
+
+    if (name != null) {
+      var duration = const Duration(milliseconds: 1000);
+      Timer(duration, () {
+        // ignore: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
+        context.read<RoutesCubit>().emit(RoutesDashboard());
+      });
+    } else {
+      var duration = const Duration(milliseconds: 1000);
+      Timer(duration, () {
+        // ignore: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
+        context.read<RoutesCubit>().emit(RoutesLogin());
+      });
+    }
+  }
+
+  // adding form text field
+  TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool _obscureText = true;
   void _toggle() {
@@ -56,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
     return Padding(
       padding: const EdgeInsets.all(2.0),
       child: TextField(
-        controller: kodeController,
+        controller: emailController,
         decoration: InputDecoration(
           labelText: 'Type your username here',
           labelStyle: greenTextStyleInter.copyWith(
@@ -123,15 +150,93 @@ class _LoginPageState extends State<LoginPage> {
       child: SizedBox(
         width: double.infinity,
         height: 55,
-        child: ElevatedButton(
-          style: style,
-          onPressed: () async {},
-          child: Text(
-            'Login',
-            style: whiteTextStyleInter.copyWith(
-              fontSize: 16,
-            ),
-          ),
+        child: BlocConsumer<LoginCubit, LoginState>(
+          listener: (context, state) {
+            if (state is LoginSuccess) {
+              Flushbar(
+                duration: const Duration(milliseconds: 3000),
+                flushbarPosition: FlushbarPosition.TOP,
+                backgroundColor: Colors.green,
+                titleText: Text(
+                  'Success Login',
+                  style: whiteTextStyleInter.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                messageText: Text(
+                  'Berhasil melakukan login',
+                  style: whiteTextStyleInter.copyWith(
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+              ).show(context);
+              // ignore: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
+              context.read<RoutesCubit>().emit(RoutesDashboard());
+            } else if (state is LoginFailed) {
+              Flushbar(
+                duration: const Duration(milliseconds: 3000),
+                flushbarPosition: FlushbarPosition.TOP,
+                backgroundColor: Colors.red,
+                titleText: Text(
+                  'Gagal Login',
+                  style: whiteTextStyleInter.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                messageText: Text(
+                  state.message,
+                  style: whiteTextStyleInter.copyWith(
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+              ).show(context);
+            }
+          },
+          builder: (context, state) {
+            if (state is LoginLoading) {
+              return const Center(
+                child: SpinKitFadingCircle(
+                  color: kPrimaryColor,
+                  size: 50,
+                ),
+              );
+            }
+            return ElevatedButton(
+              style: style,
+              onPressed: () async {
+                if (emailController.text == "" ||
+                    passwordController.text == "") {
+                  Flushbar(
+                    duration: const Duration(milliseconds: 3000),
+                    flushbarPosition: FlushbarPosition.TOP,
+                    backgroundColor: Colors.red,
+                    titleText: Text(
+                      'Ada form kosong!',
+                      style: whiteTextStyleInter.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    messageText: Text(
+                      'Lakukan pengisian form dengan benar',
+                      style: whiteTextStyleInter.copyWith(
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                  ).show(context);
+                } else {
+                  // ignore: use_build_context_synchronously
+                  context.read<LoginCubit>().loginGlobal(
+                      emailController.text, passwordController.text);
+                }
+              },
+              child: Text(
+                'Login',
+                style: whiteTextStyleInter.copyWith(
+                  fontSize: 16,
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
