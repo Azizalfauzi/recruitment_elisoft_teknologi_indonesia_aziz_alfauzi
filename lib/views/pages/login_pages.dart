@@ -85,13 +85,13 @@ class _LoginPageState extends State<LoginPage> {
       child: TextField(
         controller: emailController,
         decoration: InputDecoration(
-          labelText: 'Type your username here',
+          labelText: 'Type your email here',
           labelStyle: greenTextStyleInter.copyWith(
             fontSize: 15,
             fontWeight: light,
           ),
           border: const OutlineInputBorder(),
-          hintText: 'Username',
+          hintText: 'email',
         ),
       ),
     );
